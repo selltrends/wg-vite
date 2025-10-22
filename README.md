@@ -62,7 +62,7 @@ All commands from now on should be run from inside the virtual environment.
 
    ```bash
    cd .. 
-   zip -r news.zip news-template-main
+   zip -r news.zip wg-vite
    ```
 
 
