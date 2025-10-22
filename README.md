@@ -6,29 +6,24 @@
 1. **Create a Virtual Environment**: 
 
    ```bash
+   mkdir myproject && cd $_
    python3 -m venv .venv
    source .venv/bin/activate
    ```
 
-2. **Navigate to Project Directory**: Move into the newly created project directory.
-
-   ```bash
-   cd myproject
-   ```
-
-3. **Install Wagtail**: Install the Wagtail CMS package using pip.
+2. **Install Wagtail**: Install the Wagtail CMS package using pip.
 
    ```bash
    pip install wagtail
    ```
 
-4. **Initialize Project**: Use the `wagtail start` command to create a new project based on the Wagtail Starter Kit template.
+3. **Initialize Project**: Use the `wagtail start` command to create a new project based on the Wagtail Starter Kit template.
 
    ```bash
    wagtail start --template=https://github.com/selltrends/wg-vite/archive/refs/heads/main.zip myproject .
    ```
 
-5. **Install Project Dependencies**: Install the project's dependencies into a virtual environment.
+4. **Install Project Dependencies**: Install the project's dependencies into a virtual environment.
 
    ```bash
    pip install -r requirements.txt
@@ -54,6 +49,16 @@ All commands from now on should be run from inside the virtual environment.
 
     - Username: admin
     - Password: password
+
+## Load Fixture Datat
+
+Frontend Developing Process**:
+
+   ```bash
+   npm install 
+   npm run build
+   npm run dev
+   ```
 
 
 ### Local Developing Precess
