@@ -13,7 +13,7 @@ from willow.image import Image as WillowImage
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import RichTextField
-from wagtail.models import Orderable, Page
+from wagtail.models import Orderable, Page, TranslatableMixin
 from wagtail.rich_text import expand_db_html
 from wagtail.snippets.models import register_snippet
 
@@ -95,7 +95,7 @@ class ListingFields(models.Model):
 
 
 @register_snippet
-class AuthorSnippet(models.Model):
+class AuthorSnippet(TranslatableMixin, models.Model):
     title = models.CharField(blank=False, max_length=255)
     image = models.ForeignKey(
         "images.CustomImage",
@@ -110,7 +110,7 @@ class AuthorSnippet(models.Model):
 
 
 @register_snippet
-class ArticleTopic(models.Model):
+class ArticleTopic(TranslatableMixin, models.Model):
     title = models.CharField(blank=False, max_length=255)
     slug = models.SlugField(blank=False, max_length=255)
 
@@ -162,7 +162,7 @@ class ArticleTopic(models.Model):
 
 
 @register_snippet
-class Statistic(models.Model):
+class Statistic(TranslatableMixin, models.Model):
     statistic = models.CharField(blank=False, max_length=12)
     description = models.CharField(blank=False, max_length=225)
 
