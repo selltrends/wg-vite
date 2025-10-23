@@ -8,10 +8,10 @@
     <div class="h-4 w-full divider"></div>
 </div>
 
-<footer class="site-padding site-container w-full bg-black text-amber-100">
+<footer class="w-full bg-black text-amber-100">
     <div class="flex flex-col lg:flex-row gap-20 justify-between  container mx-auto px-4 py-20">
         {% if settings.navigation.NavigationSettings.footer_navigation %}
-        <div class="grid grid-cols-3 gap-20 justify-between">
+        <div class="grid grid-cols-2 gap-20 justify-between">
             {% for link_section in settings.navigation.NavigationSettings.footer_navigation %}
                 <div class="mb-10 lg:mb-0 lg:mr-20 flex flex-col gap-10">
                     <h2 class="text-xl md:text-2xl font-semibold">

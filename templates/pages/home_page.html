@@ -1,4 +1,5 @@
 {% verbatim %}
+
 {% extends "base_page.html" %}
 {% load wagtailcore_tags wagtailimages_tags static %}
 
@@ -9,27 +10,7 @@
                 {{ page.title }}
             </h1>
             
-            <div class="
-                absolute
-                overflow-hidden
-                z-[-1]
-                right-[-78px]
-                top-[98px]
-                w-52
-                h-52
-                md:right-[-131px]
-                md:top-[24px]
-                tall:md:top-[131px]
-                md:w-64
-                md:h-64
-                rotate-[32deg]
-                border-[3px]
-                rounded-3xl
-                border-dashed
-                border-mackerel-200"
-            >
-            </div>
-            <div class="max-w-[636px] pt-5 rich-text">
+           <div class="max-w-[636px] pt-5 rich-text">
                 {{ page.introduction|richtext }}
             </div>
             {% if page.hero_cta %}
@@ -45,4 +26,5 @@
     {% include "components/related-pages.html" %}
 
 {% endblock %}
+
 {% endverbatim %}

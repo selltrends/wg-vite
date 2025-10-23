@@ -3,34 +3,16 @@
 {% wagtail_site as current_site %}
 
 
-<header class="site-container w-full px-10 pt-14 pb-8 md:py-8 md:px-20">
-    <div class="flex justify-between items-center ">
-        <a 
-            href="/"
-            data-header-logo
-            class="header-logo z-30 uppercase font-semibold text-3xl"
-            aria-label="Go to the Wagtail Starter Kit homepage">
-            {{ current_site.site_name|default:"Site name" }}
-        </a>
-
-        
-        <div class="flex md:hidden items-center gap-4">
-            <button 
-                class="z-30 button-menu-toggle" 
-                data-mobile-menu-toggle
-                aria-haspopup="true" 
-                aria-expanded="false" 
-                aria-label="Open navigation menu"
-            >
-                <span class="button-menu-toggle__line"></span>
-                <span class="button-menu-toggle__line"></span>
-                <span class="sr-only">Menu</span>
-            </button>
-        </div>
-        
-        
-        <nav aria-label="Primary" class="hidden md:block">
-            <ul class="flex gap-x-12 lg:gap-x-14">
+<header class="">
+    <div class="navbar bg-base-100 shadow-sm">
+        <div class="navbar-start">
+            <div class="dropdown">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" /> </svg>
+            </div>
+            <ul
+                tabindex="-1"
+                class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
                 {% for link in settings.navigation.NavigationSettings.primary_navigation %}
                     <li>
                         {% if link.value.page %}
@@ -54,87 +36,29 @@
                         {% endif %}
                     </li>
                 {% endfor %}
-                <li class="flex items-center">
-                    <button 
-                        data-toggle-search-panel
-                        type="button"
-                        aria-expanded="true" 
-                        aria-controls="search-panel" 
-                        aria-label="Show search overlay" 
-                        class=""
-                        >
+            </ul>
+            </div>
+        </div>
+        <div class="navbar-center">
+            <a class="btn btn-ghost text-xl">{{ current_site.site_name|default:"Site name" }}</a>
+        </div>
+        <div class="navbar-end">
+ 
+            <button 
+                data-toggle-search-panel
+                type="button"
+                aria-expanded="true" 
+                aria-controls="search-panel" 
+                aria-label="Show search overlay" 
+                class="mx-4">
                         <span class="sr-only">
                         Search 
                         </span>
-                        {% include "icons/magnifying-glass.html" with class="fill-current w-5 h-5" %}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /> </svg>
                     </button>
-                </li>
-                <li>
-                    {% include "components/theme-toggle.html" %}
-                </li>
-            </ul>
-        </nav>
+            {% include "components/theme-toggle.html" %}
+        </div>
     </div>
-
-    
-    <section 
-        class="
-        md:hidden 
-        invisible 
-        transition-all 
-        duration-[640ms] 
-        ease-out-expo 
-        translate-x-full 
-        h-screen 
-        w-full
-        fixed 
-        top-0
-        left-0 
-        z-20
-        bg-mackerel-300
-        px-10 md:px-20
-        " 
-        data-mobile-menu-content
-    >
-    <nav aria-label="Primary" class="py-32">
-        <ul class="flex flex-col pt-5">
-            {% for link in settings.navigation.NavigationSettings.primary_navigation %}
-                <li class="
-                    border-t-[1px]
-                    border-dashed
-                    border-mackerel-200
-                    last-of-type:border-b-[1px]
-                ">
-                    {% if link.value.page %}
-                        <a 
-                            class="
-                            flex
-                            py-6
-                            text-lg
-                            items-center 
-                            font-semibold 
-                            font-codepro
-                            underline
-                            underline-offset-8
-                            text-white
-                            decoration-transparent
-                            hover:decoration-white
-                            decoration-[1.5px]
-                            " 
-                            href="" 
-                        >
-                             {{ link.value.get_title }}
-                        </a>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
-        {% include "components/search.html" with variant="mobile-menu" %}
-        {% include "components/theme-toggle.html" %}
-    </nav>
-    </section>
-
-    
     <div 
         id="search-panel"
         data-search-panel
@@ -154,6 +78,6 @@
         "
     >
         {% include "components/search.html" with variant="search-panel" %}
-    </div>
+    </div>    
 </header>
 {% endverbatim %}
