@@ -9,7 +9,138 @@ from wagtail.images.blocks import ImageBlock, ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from {{ project_name }}.utils.struct_values import CardStructValue, LinkStructValue
+from {{ project_name }}.utils.choices import SVGIcon
 
+
+class CTALinkStructValue(blocks.StructValue):
+    def url(self):
+        if cta_url := self.get("cta_url"):
+            return cta_url
+
+        if cta_page := self.get("cta_page"):
+            return cta_page.url
+
+        return ""
+
+
+class CTALinkMixin(blocks.StructBlock):
+    class Meta:
+        value_class = CTALinkStructValue
+
+    def clean(self, value):
+        struct_value = super().clean(value)
+
+        errors = {}
+        url = value.get("cta_url")
+        page = value.get("cta_page")
+        if self.required and not page and not url:
+            error = ErrorList(
+                [ValidationError("You must specify CTA page or CTA URL.")]
+            )
+            errors["cta_url"] = errors["cta_page"] = error
+
+        if page and url:
+            error = ErrorList(
+                [
+                    ValidationError(
+                        "You must specify CTA page or CTA URL. You can't use both."
+                    )
+                ]
+            )
+            errors["cta_url"] = errors["cta_page"] = error
+
+        if not value.get("text") and (page or url):
+            error = ErrorList([ValidationError("You must specify CTA text.")])
+            errors["text"] = error
+
+        if errors:
+            raise StructBlockValidationError(errors)
+        return struct_value
+
+    def get_context(self, value, parent_context=None):
+        context = super().get_context(value, parent_context=parent_context)
+        if value["cta_url"]:
+            context["value"]["url"] = value["cta_url"]
+        if value["cta_page"]:
+            context["value"]["url"] = value["cta_page"].get_url
+        return context
+
+
+class CTABlock(CTALinkMixin):
+    text = blocks.CharBlock(label="CTA text", max_length=255, required=False)
+    cta_page = blocks.PageChooserBlock(label="CTA page", required=False)
+    cta_url = blocks.URLBlock(label="CTA URL", required=False)
+
+    @property
+    def required(self):
+        return True
+
+    class Meta:
+        icon = "bullhorn"
+        template = "components/streamfields/cta/cta_block.html"
+        label = "CTA"
+
+
+class OptionalCTABlock(CTABlock):
+    @property
+    def required(self):
+        return False
+
+
+class CardBlock(blocks.StructBlock):
+    heading = blocks.CharBlock(max_length=255)
+    description = blocks.RichTextBlock(required=False, features=["bold", "italic"])
+    meta_icon = blocks.ChoiceBlock(choices=SVGIcon.choices)
+    meta_text = blocks.TextBlock(max_length=50)
+    cta = OptionalCTABlock()
+
+    class Meta:
+        icon = "address-card"
+        template = "components/streamfields/cards/card_block.html"
+        label = "Card"
+
+
+class LogoCardBlock(CTALinkMixin):
+    text = blocks.CharBlock(label="Heading", max_length=255)
+    description = blocks.RichTextBlock(required=False, features=["bold", "italic"])
+    meta_icon = blocks.ChoiceBlock(choices=SVGIcon.choices)
+    meta_text = blocks.TextBlock(max_length=50)
+    logo = ImageBlock(required=False)
+    cta_page = blocks.PageChooserBlock(label="CTA page", required=False)
+    cta_url = blocks.URLBlock(label="CTA URL", required=False)
+
+    class Meta:
+        icon = "image"
+        template = "components/streamfields/cards/logo_card_block.html"
+        label = "Logo card"
+
+
+class CardsBlock(blocks.StructBlock):
+    cards = blocks.ListBlock(CardBlock())
+
+    class Meta:
+        template = "components/streamfields/cards/cards_list_block.html"
+        label = "Cards"
+
+
+class LogoCardsBlock(blocks.StructBlock):
+    heading = blocks.CharBlock(max_length=255, required=False)
+    cards = blocks.ListBlock(LogoCardBlock())
+
+    class Meta:
+        template = "components/streamfields/cards/logo_cards_list_block.html"
+        label = "Logo cards"
+
+
+class LogoBlock(blocks.StructBlock):
+    heading = blocks.CharBlock(required=False)
+    logos = blocks.ListBlock(
+        ImageBlock(),
+    )
+
+    class Meta:
+        icon = "HEART"
+        template = "components/streamfields/logo_block/logo_block.html"
 
 class AccordionBlock(blocks.StructBlock):
     title = blocks.CharBlock(max_length=255)
@@ -224,6 +355,16 @@ class StoryBlock(blocks.StreamBlock):
     section = SectionBlock()
     cta = CTASectionBlock()
     statistics = StatisticSectionBlock()
+
+    class Meta:
+        template = "components/streamfield/stream_block.html"
+
+
+class HomePageStoryBlock(blocks.StreamBlock):
+    section = SectionBlock()
+    cta = CTASectionBlock()
+    statistics = StatisticSectionBlock()
+    logos = LogoBlock()
 
     class Meta:
         template = "components/streamfield/stream_block.html"

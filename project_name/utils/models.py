@@ -5,22 +5,27 @@ from django.core.files.images import ImageFile
 from django.contrib.staticfiles.finders import find
 from django.db import models
 from django.db.models import QuerySet
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
 from willow.image import Image as WillowImage
 
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
-from wagtail.fields import RichTextField
+from wagtail.fields import RichTextField, StreamField
+from wagtail import blocks
 from wagtail.models import Orderable, Page, TranslatableMixin
 from wagtail.rich_text import expand_db_html
 from wagtail.snippets.models import register_snippet
+from wagtail.images import get_image_model_string
 
 from {{ project_name }}.images.models import CustomImage
 from {{ project_name }}.utils.cache import get_default_cache_control_decorator
 from {{ project_name }}.utils.query import order_by_pk_position
-
+from {{ project_name }}.utils.blocks import LinkStreamBlock, BaseSectionBlock
 
 # Related pages
 class PageRelatedPage(Orderable):
@@ -92,6 +97,185 @@ class ListingFields(models.Model):
             "Listing information",
         )
     ]
+
+
+
+# -- Carousel ----------------------------------------------------------
+
+@register_snippet
+class Carousel(ClusterableModel):
+     
+    """
+    Model that represents a Carousel. Can be modified through the snippets UI.
+    Selected through Page StreamField bodies by the CarouselSnippetChooser in
+    snippet_choosers.py
+    """
+
+    class Meta:
+        verbose_name = _("Carousel")
+
+    name = models.CharField(
+        max_length=255,
+        verbose_name=_("Name"),
+    )
+    show_controls = models.BooleanField(
+        default=True,
+        verbose_name=_("Show controls"),
+        help_text=_(
+            "Shows arrows on the left and right of the carousel to advance "
+            "next or previous slides."
+        ),
+    )
+    show_indicators = models.BooleanField(
+        default=True,
+        verbose_name=_("Show indicators"),
+        help_text=_(
+            "Shows small indicators at the bottom of the carousel based on the "
+            "number of slides."
+        ),
+    )
+
+    panels = [
+        MultiFieldPanel(
+            heading=_("Slider"),
+            children=[
+                FieldPanel("name"),
+                FieldPanel("show_controls"),
+                FieldPanel("show_indicators"),
+            ],
+        ),
+        InlinePanel("carousel_slides", label=_("Slides")),
+    ]
+
+    def __str__(self):
+        return self.name
+    
+
+class CarouselSlide( Orderable, models.Model):
+    """
+    Represents a slide for the Carousel model. Can be modified through the
+    snippets UI.
+    """
+
+    class Meta(Orderable.Meta):
+        verbose_name = _("Carousel Slide")
+
+    carousel = ParentalKey(
+        Carousel,
+        related_name="carousel_slides",
+        verbose_name=_("Carousel"),
+    )
+    image = models.ForeignKey(
+        get_image_model_string(),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+        verbose_name=_("Image"),
+    )
+    background_color = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("Background color"),
+        help_text=_("Hexadecimal, rgba, or CSS color notation (e.g. #ff0011)"),
+    )
+    custom_css_class = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("Custom CSS class"),
+    )
+    custom_id = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("Custom ID"),
+    )
+
+    content = StreamField([
+        ('heading', blocks.CharBlock(form_classname="title")),
+        ('paragraph', blocks.RichTextBlock()),
+    ])
+
+    panels = [
+        FieldPanel("image"),
+        FieldPanel("background_color"),
+        FieldPanel("custom_css_class"),
+        FieldPanel("custom_id"),
+        FieldPanel("content"),
+    ]
+
+
+# -- Navbar ----------------------------------------------------------
+
+class NavbarLinkBlock(LinkStreamBlock):
+    """
+    Simple link in the navbar.
+    """
+
+    class Meta:
+        icon = "link"
+        label = "Link"
+        template = "components/streamfield/blocks/navbar_link.html"
+
+
+
+class NavbarDropdownBlock(BaseSectionBlock):
+    """
+    Custom dropdown menu with heading, links, and rich content.
+    """
+
+    class Meta:
+        icon = "arrow-down"
+        label = "Dropdown"
+        template = "components/streamfield/blocks/navbar_dropdown.html"
+
+    title = blocks.CharBlock(
+        max_length=255,
+        required=True,
+        label="Title",
+    )
+    links = blocks.StreamBlock(
+        [("link", NavbarLinkBlock())],
+        required=True,
+        label="Links",
+    )
+    description = blocks.RichTextBlock(
+        required=False,
+        label="Description",
+    )
+
+
+@register_snippet
+class Navbar(models.Model):
+    """
+    Custom navigation bar / menu.
+    """
+
+    class Meta:
+        verbose_name = "Navigation Bar"
+
+    name = models.CharField(
+        max_length=255,
+    )
+    content = StreamField(
+        [
+            ("link", NavbarLinkBlock()),
+            ("dropdown", NavbarDropdownBlock()),
+        ],
+        use_json_field=True,
+    )
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("content"),
+    ]
+
+    def __str__(self) -> str:
+        return self.name
+
+
+
+# -- Footer ----------------------------------------------------------
+
 
 
 @register_snippet

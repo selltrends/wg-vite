@@ -4,7 +4,7 @@ from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
 from wagtail.search import index
 
 from wagtail.fields import StreamField
-from {{ project_name }}.utils.blocks import StoryBlock, InternalLinkBlock
+from {{ project_name }}.utils.blocks import HomePageStoryBlock, InternalLinkBlock
 from {{ project_name }}.utils.models import BasePage
 
 
@@ -17,7 +17,7 @@ class HomePage(BasePage):
         min_num=0,
         max_num=1,
     )
-    body = StreamField(StoryBlock())
+    body = StreamField(HomePageStoryBlock())
     featured_section_title = models.TextField(blank=True)
 
     search_fields = BasePage.search_fields + [index.SearchField("introduction")]
