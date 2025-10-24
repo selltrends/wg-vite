@@ -7,15 +7,40 @@ from wagtail.fields import StreamField
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 from {{ project_name }}.utils.blocks import LinkStreamBlock, InternalLinkBlock
+from {{ project_name }}.navigation.blocks import MainMenuSectionBlock
+from wagtail.snippets.models import register_snippet
 
+
+@register_snippet
+class MainMenu(ClusterableModel):
+    name = models.CharField(max_length=255)
+    menu_sections = StreamField([("menu_section", MainMenuSectionBlock())])
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("menu_sections", classname="collapsible"),
+    ]
+
+    class Meta:
+        verbose_name = "Main menu"
+
+    def __str__(self) -> str:
+        return f"Main menu: {self.name}"
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        for nav in NavigationSettings.objects.filter(main_navigation=self):
+            nav.save(fragment_to_clear="primarynav")
 
 @register_setting(icon="list-ul")
 class NavigationSettings(BaseSiteSetting, ClusterableModel):
-    primary_navigation = StreamField(
-        [("link", InternalLinkBlock())],
+    primary_navigation = models.ForeignKey(
+        "navigation.MainMenu",
+        null=True,
         blank=True,
-        help_text="Main site navigation",
-        
+        on_delete=models.SET_NULL,
+        related_name="+",
     )
     footer_navigation = StreamField(
         [("link_section", blocks.StructBlock([
@@ -33,3 +58,4 @@ class NavigationSettings(BaseSiteSetting, ClusterableModel):
         FieldPanel("primary_navigation"),
         FieldPanel("footer_navigation"),
     ]
+
