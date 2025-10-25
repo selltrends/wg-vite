@@ -11,6 +11,13 @@ from {{ project_name }}.utils.models import BasePage
 class HomePage(BasePage):
     template = "pages/home_page.html"
     introduction = models.TextField(blank=True)
+    carousel = models.ForeignKey(
+          'utils.Carousel',
+          null=True,
+          blank=True,
+          on_delete=models.SET_NULL,
+          related_name='+'
+      )
     hero_cta = StreamField(
         [("link", InternalLinkBlock())],
         blank=True,
@@ -24,6 +31,7 @@ class HomePage(BasePage):
 
     content_panels = BasePage.content_panels + [
         FieldPanel("introduction"),
+        FieldPanel("carousel"),
         FieldPanel("hero_cta"),
         FieldPanel("body"),
         MultiFieldPanel(

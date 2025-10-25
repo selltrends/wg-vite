@@ -18,6 +18,11 @@
                     {% include "components/button.html" with title=page.hero_cta.0.value.get_title url=page.hero_cta.0.value.get_url classes="btn btn-accent"%}
                 </div>
             {% endif %}
+            {% if page.carousel %}
+                <div class="pt-10">
+                    {% include "components/carousel.html" %} 
+                </div>
+            {% endif %}
         </div>
     </div>
 
