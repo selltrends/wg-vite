@@ -30,7 +30,7 @@ class MainMenu(ClusterableModel):
     def save(self, **kwargs):
         super().save(**kwargs)
 
-        for nav in NavigationSettings.objects.filter(main_navigation=self):
+        for nav in NavigationSettings.objects.filter(primary_navigation=self):
             nav.save(fragment_to_clear="primarynav")
 
 @register_setting(icon="list-ul")
