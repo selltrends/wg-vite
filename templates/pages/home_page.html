@@ -15,7 +15,7 @@
             </div>
             {% if page.hero_cta %}
                 <div class="pt-10">
-                    {% include "components/button.html" with title=page.hero_cta.0.value.get_title url=page.hero_cta.0.value.get_url %}
+                    {% include "components/button.html" with title=page.hero_cta.0.value.get_title url=page.hero_cta.0.value.get_url classes="btn btn-accent"%}
                 </div>
             {% endif %}
         </div>
