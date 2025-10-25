@@ -1,3 +1,4 @@
+{% verbatim %}
 {% load wagtailcore_tags wagtailimages_tags static %}
 <div class="carousel w-full">
   <div id="slide1" class="carousel-item relative w-full">
@@ -39,7 +40,10 @@
 </div>
 
 
-<div id="carousel-{{self.carousel.id}}" class="carousel slide" data-bs-ride="carousel">
+   
+        
+  
+<div id="carousel-{{self.carousel.id}}" class="carousel w-full" data-bs-ride="carousel">
   {% if self.carousel.show_indicators %}
   <div class="carousel-indicators">
     {% for item in self.carousel.carousel_slides.all %}
@@ -57,7 +61,7 @@
       {% block carousel_slide_image %}
       {% if item.image %}
       {% image item.image fill-1600x900 format-webp preserve-svg as carouselimage %}
-      <img class="d-block w-100" src="{{carouselimage.url}}" alt="{{carouselimage.image.title}}">
+      <img class="w-full" src="{{carouselimage.url}}" alt="{{carouselimage.image.title}}">
       {% endif %}
       {% endblock %}
       <div class="carousel-caption d-none d-md-block">
@@ -70,13 +74,15 @@
     {% endfor %}
   </div>
   {% if self.carousel.show_controls %}
-  <button class="carousel-control-prev" data-bs-target="#carousel-{{self.carousel.id}}" type="button" data-bs-slide="prev">
+  <button class="btn btn-accent btn-circle" data-bs-target="#carousel-{{self.carousel.id}}" type="button" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
+    <span class="visually-hidden">❮</span>
   </button>
-  <button class="carousel-control-next" data-bs-target="#carousel-{{self.carousel.id}}" type="button" data-bs-slide="next">
+  <button class="btn btn-accent btn-circle" data-bs-target="#carousel-{{self.carousel.id}}" type="button" data-bs-slide="next">
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
+    <span class="visually-hidden">❯</span>
   </button>
   {% endif %}
 </div>
+
+{% endverbatim %}
